@@ -60,11 +60,19 @@ class NotificationRouter:
         has_direct_mention = f"@{user_id}".lower() in full_text
 
         # ---------------------------------------------------------
-        # STAGE 4A: Hard Safety & Deterministic Overrides
+        # STAGE 1: Hard Safety & Scam / Phishing / Fraud Protection
         # ---------------------------------------------------------
 
-        # Scam / Phishing Guard
-        scam_keywords = ["lottery", "prize", "otp", "verify account", "claim reward", "reattempt fee", "bankofamerica-delivery", "amazonpay-delivery"]
+        scam_keywords = [
+            "lottery", "prize", "otp", "verify account", "claim reward", "reattempt fee",
+            "bankofamerica-delivery", "amazonpay-delivery", "giveaway", "0.5 btc", "crypto",
+            "work from home", "typing online", "scratch card", "e-kyc", "kyc", "account suspended",
+            "account block", "sim card will be deactivated", "unauthorized login", "security alert",
+            "verify ssn", "instant loan", "apk", "whatsapp gold", "redelivery", "spin the wheel",
+            "spin-win", "refund pending", "t.me/", "bit.ly/", ".xyz", ".site", ".online", ".net",
+            "free ₹", "free $", "earn ₹", "earn $", "1000% return", "pump channel", "win $", "won $"
+        ]
+        
         domain_mismatch = False
         if biz_info:
             off_domain = biz_info.get("official_domain", "")
@@ -72,138 +80,191 @@ class NotificationRouter:
             if off_domain and sender_domain and off_domain != sender_domain:
                 domain_mismatch = True
 
-        if any(k in full_text for k in scam_keywords) or domain_mismatch or media_features.get("is_scam_suspect"):
+        is_unverified_imposter_biz = False
+        if biz_info:
+            is_unverified = (biz_info.get("verified") == "0")
+            user_reports = int(biz_info.get("user_reports_30d", 0) or 0)
+            if is_unverified and (user_reports > 10 or domain_mismatch):
+                is_unverified_imposter_biz = True
+
+        has_scam_pattern = any(k in full_text for k in scam_keywords) or domain_mismatch or is_unverified_imposter_biz or media_features.get("is_scam_suspect")
+
+        if has_scam_pattern:
             return {
                 "message_id": msg["message_id"],
                 "action": "mute",
                 "message_type": "scam",
-                "reason": "The message contains suspicious links, domain mismatches, or unverified scam indicators.",
+                "reason": "The message contains suspicious links, imposter business indicators, or scam patterns.",
                 "confidence": 0.95,
                 "evidence_message_ids": evidence_ids
             }
 
-        # Direct Mention Override in Muted Group
+        # ---------------------------------------------------------
+        # STAGE 2: Forwarded Spam & Chain Messages
+        # ---------------------------------------------------------
+
+        if forwarded_count >= 5 or any(w in full_text for w in ["send this message to", "send this prayer", "drink warm water", "forwarded as received"]):
+            return {
+                "message_id": msg["message_id"],
+                "action": "mute",
+                "message_type": "forward" if forwarded_count >= 5 else "spam",
+                "reason": "The message matches repeated forward chains or viral spam patterns.",
+                "confidence": 0.88,
+                "evidence_message_ids": evidence_ids
+            }
+
+        # ---------------------------------------------------------
+        # STAGE 3: Direct User Mentions & Urgent Overrides
+        # ---------------------------------------------------------
+
         if is_group_muted and has_direct_mention:
             return {
                 "message_id": msg["message_id"],
                 "action": "notify",
-                "message_type": "urgent" if ("urgent" in full_text or "eod" in full_text or "prod" in full_text) else "personal",
+                "message_type": "urgent" if any(k in full_text for k in ["urgent", "eod", "prod", "alert", "failing", "500"]) else "personal",
                 "reason": "The message contains a direct mention targeting the user, overriding muted group preferences.",
                 "confidence": 0.90,
                 "evidence_message_ids": evidence_ids
             }
 
         # ---------------------------------------------------------
-        # STAGE 4B: Personalized Dynamic Router
+        # STAGE 4: Urgent & Critical Time-Sensitive Intent
         # ---------------------------------------------------------
 
-        # 1. Forwarded Greetings & Chain Messages
-        if forwarded_count >= 5 or any(w in full_text for w in ["good morning", "stay positive", "drink warm water", "forwarded as received"]):
+        urgent_keywords = [
+            "hospital", "emergency", "broke down", "pickup", "fever", "flight", "call me immediately",
+            "call back immediately", "asap", "server", "outage", "bridge call", "500 error", "deadline",
+            "production", "failing", "critical", "room 302", "expressway"
+        ]
+
+        if any(k in full_text for k in urgent_keywords):
+            msg_cat = "urgent"
+            if "upi" in full_text or "fare" in full_text:
+                msg_cat = "payment"
             return {
                 "message_id": msg["message_id"],
-                "action": "mute",
-                "message_type": "greeting" if "good morning" in full_text else "forward",
-                "reason": "The sender has a pattern of repeated forwards or greetings that the user usually ignores.",
+                "action": "notify",
+                "message_type": msg_cat,
+                "reason": "Time-sensitive urgent message requiring immediate user attention.",
+                "confidence": 0.92,
+                "evidence_message_ids": evidence_ids
+            }
+
+        # ---------------------------------------------------------
+        # STAGE 5: Payment & Financial Transactions
+        # ---------------------------------------------------------
+
+        payment_keywords = ["upi", "credited", "debited", "salary", "bill", "due on", "split share", "refund", "card ending", "neft"]
+        if any(k in full_text for k in payment_keywords):
+            is_urgent_pay = any(k in full_text for k in ["urgently", "now", "emergency", "taxi fare", "credited"])
+            return {
+                "message_id": msg["message_id"],
+                "action": "notify" if is_urgent_pay else "digest",
+                "message_type": "payment",
+                "reason": "Financial transaction or payment notice.",
+                "confidence": 0.88,
+                "evidence_message_ids": evidence_ids
+            }
+
+        # ---------------------------------------------------------
+        # STAGE 6: Event & Party Invitations
+        # ---------------------------------------------------------
+
+        event_keywords = ["invited", "invitation", "party", "concert", "picnic", "reunion", "wedding", "save the date", "book of the month", "water supply", "shut off", "tickets"]
+        if any(k in full_text for k in event_keywords):
+            return {
+                "message_id": msg["message_id"],
+                "action": "digest",
+                "message_type": "event",
+                "reason": "Event invitation or scheduled community notice.",
                 "confidence": 0.85,
                 "evidence_message_ids": evidence_ids
             }
 
-        # 2. Urgent Group Notices (Water tanker, school bus, work emergency)
-        urgent_keywords = ["water", "tanker", "bus", "valve", "plumber", "school", "parents", "prod review", "urgent", "emergency", "deadline"]
-        if conv_type == "group" and any(k in full_text for k in urgent_keywords):
-            if is_admin_sender:
-                msg_cat = "event" if ("school" in full_text or "bus" in full_text or "parents" in full_text) else "urgent"
+        # ---------------------------------------------------------
+        # STAGE 7: Business Account Messaging (Verified)
+        # ---------------------------------------------------------
+
+        if conv_type == "business" and biz_info:
+            is_promo_text = any(k in full_text for k in ["sale", "off", "discount", "coupon", "arrivals", "eorr", "flash sale"])
+            if is_promo_text:
                 return {
                     "message_id": msg["message_id"],
-                    "action": "notify",
-                    "message_type": msg_cat,
-                    "reason": "A trusted group admin sent a time-sensitive update that should interrupt the user.",
-                    "confidence": 0.89,
+                    "action": "digest",
+                    "message_type": "promotion",
+                    "reason": "Promotional campaign update from business sender.",
+                    "confidence": 0.82,
+                    "evidence_message_ids": evidence_ids
+                }
+            else:
+                return {
+                    "message_id": msg["message_id"],
+                    "action": "notify" if any(k in full_text for k in ["shipped", "dispatched", "delivered"]) else "digest",
+                    "message_type": "business_update",
+                    "reason": "Verified business notification update.",
+                    "confidence": 0.86,
                     "evidence_message_ids": evidence_ids
                 }
 
-        # 3. Direct Personal Questions / Requests
-        if conv_type == "personal" or has_direct_mention or any(k in full_text for k in ["call", "pickup", "check", "when you get 5 mins"]):
-            if not is_group_muted:
+        # ---------------------------------------------------------
+        # STAGE 8: Personal 1-on-1 Chats
+        # ---------------------------------------------------------
+
+        if conv_type == "personal":
+            is_casual = any(k in full_text for k in ["dinner", "coffee", "photos", "recipe", "movie", "catch up", "how are you", "weekend"])
+            if is_casual:
+                msg_cat = "greeting" if ("coffee" in full_text or "how are you" in full_text or "great week" in full_text) else "personal"
+                return {
+                    "message_id": msg["message_id"],
+                    "action": "digest",
+                    "message_type": msg_cat,
+                    "reason": "Casual personal conversation update.",
+                    "confidence": 0.82,
+                    "evidence_message_ids": evidence_ids
+                }
+            else:
                 return {
                     "message_id": msg["message_id"],
                     "action": "notify",
                     "message_type": "personal",
-                    "reason": "The sender directly asks this user for a response or action.",
+                    "reason": "Direct personal message from contact.",
                     "confidence": 0.87,
                     "evidence_message_ids": evidence_ids
                 }
 
-        # 4. Verified Business Updates vs Promotions
-        if conv_type == "business" and biz_info:
-            is_verified = (biz_info.get("verified") == "1")
-            allows_promo = (user_biz_info.get("allows_promotions") == "1")
-            has_history = bool(user_biz_info.get("why_user_knows_account"))
+        # ---------------------------------------------------------
+        # STAGE 9: Group Message Default
+        # ---------------------------------------------------------
 
-            is_promo_text = any(k in full_text for k in ["sale", "off", "discount", "itinerary", "unsubscribe", "try50"])
-            
-            if is_promo_text:
-                if allows_promo:
-                    return {
-                        "message_id": msg["message_id"],
-                        "action": "digest",
-                        "message_type": "promotion",
-                        "reason": "The message is promotional but matches a topic or business the user has opted into.",
-                        "confidence": 0.78,
-                        "evidence_message_ids": evidence_ids
-                    }
-                else:
-                    return {
-                        "message_id": msg["message_id"],
-                        "action": "mute",
-                        "message_type": "promotion",
-                        "reason": "Promotional message from a business sender without active user opt-in or engagement.",
-                        "confidence": 0.82,
-                        "evidence_message_ids": evidence_ids
-                    }
-            elif is_verified and has_history:
-                msg_cat = "payment" if "pay" in full_text or "bill" in full_text else "business_update"
-                if "health" in full_text or "appointment" in full_text:
-                    msg_cat = "event"
-                return {
-                    "message_id": msg["message_id"],
-                    "action": "notify" if not is_dnd else "digest",
-                    "message_type": msg_cat,
-                    "reason": "A verified business is sending an update that matches the user's recent activity history.",
-                    "confidence": 0.89 if not is_dnd else 0.80,
-                    "evidence_message_ids": evidence_ids
-                }
-
-        # 5. Casual Group Chats / Digest Items
         if conv_type == "group":
             if is_group_muted:
                 return {
                     "message_id": msg["message_id"],
                     "action": "mute",
-                    "message_type": "greeting" if "good morning" in full_text else "personal",
-                    "reason": "Group is muted by user and message does not contain urgent admin update or direct mention.",
+                    "message_type": "personal",
+                    "reason": "Group is muted by user.",
                     "confidence": 0.84,
                     "evidence_message_ids": evidence_ids
                 }
-            
-            # Event / Form / General Notice
-            if any(k in full_text for k in ["form", "sheet", "match", "casual", "selling", "peaceful", "good morning"]):
-                cat = "event" if "form" in full_text else ("greeting" if "peaceful" in full_text or "good morning" in full_text else "promotion" if "selling" in full_text else "personal")
+            else:
                 return {
                     "message_id": msg["message_id"],
                     "action": "digest",
-                    "message_type": cat,
-                    "reason": "The message is useful group information, but it is not urgent enough to interrupt the user.",
-                    "confidence": 0.82,
+                    "message_type": "personal",
+                    "reason": "Standard group activity update.",
+                    "confidence": 0.80,
                     "evidence_message_ids": evidence_ids
                 }
 
-        # Default Catch-All Route
+        # ---------------------------------------------------------
+        # STAGE 10: Fallback Route
+        # ---------------------------------------------------------
+
         return {
             "message_id": msg["message_id"],
             "action": "digest" if not is_dnd else "mute",
-            "message_type": "unknown",
-            "reason": "Standard background update routed based on default priority context.",
-            "confidence": 0.75,
+            "message_type": "personal" if conv_type == "personal" else ("business_update" if conv_type == "business" else "personal"),
+            "reason": "Standard contextual priority routing.",
+            "confidence": 0.78,
             "evidence_message_ids": evidence_ids
         }

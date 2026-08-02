@@ -1,111 +1,111 @@
 message_id,action,message_type,reason,confidence,evidence_message_ids
-msg_023,digest,business_update,Verified business notification update.,0.86,message_0243;message_0102
-msg_091,notify,personal,Direct personal message from contact.,0.87,message_0238;message_0381
-msg_090,notify,personal,Direct personal message from contact.,0.87,message_0339;message_0338
-msg_048,digest,personal,Standard group activity update.,0.8,message_0151;message_0152
-msg_040,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0136;message_0135
-msg_075,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0206;message_0205
-msg_005,digest,personal,Standard group activity update.,0.8,message_0065;message_0332
-msg_104,notify,personal,Direct personal message from contact.,0.87,message_0050;message_0383
-msg_069,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0194;message_0193
-msg_107,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0173;message_0213
-msg_070,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0369;message_0213
-msg_003,digest,business_update,Verified business notification update.,0.86,message_0031;message_0400
-msg_099,notify,personal,Direct personal message from contact.,0.87,message_0227;message_0249
-msg_008,digest,business_update,Verified business notification update.,0.86,message_0072;message_0071
-msg_092,digest,promotion,Promotional campaign update from business sender.,0.82,message_0346;message_0344
-msg_060,digest,personal,Standard group activity update.,0.8,message_0176;message_0284
-msg_004,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0246;message_0245
-msg_030,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0115;message_0050
-msg_045,digest,personal,Standard group activity update.,0.8,message_0371;message_0230
-msg_052,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0208;message_0207
-msg_009,mute,personal,Group is muted by user.,0.84,message_0074;message_0073
-msg_071,digest,personal,Standard group activity update.,0.8,message_0197;message_0198
-msg_016,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0087;message_0024
-msg_065,digest,promotion,Promotional campaign update from business sender.,0.82,message_0261;message_0260
-msg_038,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0131;message_0132
-msg_086,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0249;message_0222
-msg_014,digest,promotion,Promotional campaign update from business sender.,0.82,message_0017;message_0258
-msg_094,digest,promotion,Promotional campaign update from business sender.,0.82,message_0356;message_0048
-msg_029,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0095;message_0332
-msg_105,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0233;message_0373
-msg_002,digest,payment,Financial transaction or payment notice.,0.88,message_0169;message_0266
-msg_010,digest,business_update,Verified business notification update.,0.86,message_0011;message_0242
-msg_078,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0211;message_0212
-msg_013,notify,payment,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0081;message_0082
-msg_018,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0092;message_0026
-msg_044,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0036;message_0143
-msg_032,digest,personal,Standard group activity update.,0.8,message_0285;message_0119
-msg_106,notify,personal,Direct personal message from contact.,0.87,message_0234;message_0376
-msg_006,digest,personal,Standard group activity update.,0.8,message_0271;message_0029
-msg_109,digest,personal,Standard group activity update.,0.8,message_0151;message_0152
-msg_108,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0094;message_0093
-msg_019,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0275;message_0277
-msg_088,mute,personal,Group is muted by user.,0.84,message_0115;message_0050
-msg_056,notify,personal,"The message contains a direct mention targeting the user, overriding muted group preferences.",0.9,message_0226;message_0077
-msg_027,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0272;message_0033
-msg_050,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0279;message_0278
-msg_083,digest,personal,Standard group activity update.,0.8,message_0219
-msg_063,digest,personal,Standard group activity update.,0.8,message_0254;message_0255
-msg_033,digest,personal,Standard group activity update.,0.8,message_0409;message_0121
-msg_061,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0193;message_0194
-msg_020,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0095;message_0390
-msg_017,mute,personal,Group is muted by user.,0.84,message_0090;message_0089
-msg_058,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0078;message_0172
-msg_026,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0032;message_0107
-msg_047,digest,personal,Standard group activity update.,0.8,message_0150;message_0152
-msg_046,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0148;message_0147
-msg_042,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0140;message_0057
-msg_079,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0369;message_0173
-msg_098,notify,personal,Direct personal message from contact.,0.87,message_0226;message_0054
-msg_037,digest,personal,Standard group activity update.,0.8,message_0130;message_0269
-msg_007,digest,personal,Standard group activity update.,0.8,message_0275;message_0070
-msg_085,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0173;message_0221
-msg_001,digest,personal,Standard group activity update.,0.8,message_0057;message_0240
-msg_021,digest,personal,Standard group activity update.,0.8,message_0130;message_0190
-msg_028,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0034;message_0112
-msg_012,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0194;message_0247
-msg_064,digest,payment,Financial transaction or payment notice.,0.88,message_0087;message_0183
-msg_103,notify,personal,Direct personal message from contact.,0.87,message_0065;message_0332
-msg_031,digest,personal,Standard group activity update.,0.8,message_0249;message_0055
-msg_057,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0169;message_0031
-msg_087,mute,personal,Group is muted by user.,0.84,message_0391;message_0389
-msg_067,digest,personal,Standard group activity update.,0.8,message_0068;message_0030
-msg_039,digest,personal,Standard group activity update.,0.8,message_0255;message_0364
-msg_082,digest,personal,Standard group activity update.,0.8,message_0218;message_0397
-msg_066,digest,promotion,Promotional campaign update from business sender.,0.82,message_0402;message_0052
-msg_049,notify,urgent,Time-sensitive urgent message requiring immediate user attention.,0.92,message_0291;message_0154
-msg_015,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0173;message_0213
-msg_051,digest,promotion,Promotional campaign update from business sender.,0.82,message_0402;message_0052
-msg_097,digest,personal,Casual personal conversation update.,0.82,message_0054;message_0167
-msg_089,notify,personal,Direct personal message from contact.,0.87,message_0299;message_0396
-msg_053,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0411;message_0253
-msg_059,digest,personal,Standard group activity update.,0.8,message_0173;message_0053
-msg_024,digest,promotion,Promotional campaign update from business sender.,0.82,message_0402;message_0052
-msg_072,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0213;message_0085
-msg_036,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0283;message_0127
-msg_076,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0208;message_0207
-msg_055,digest,personal,Standard group activity update.,0.8,message_0166;message_0165
-msg_102,notify,personal,Direct personal message from contact.,0.87,message_0371;message_0230
-msg_080,digest,personal,Standard group activity update.,0.8,message_0130;message_0190
-msg_093,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0348;message_0349
-msg_034,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0077;message_0078
-msg_035,digest,business_update,Verified business notification update.,0.86,message_0281;message_0125
-msg_101,notify,personal,Direct personal message from contact.,0.87,message_0370;message_0229
-msg_041,mute,scam,"The message contains suspicious links, imposter business indicators, or scam patterns.",0.95,message_0077;message_0171
-msg_011,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0077;message_0171
-msg_110,notify,personal,Direct personal message from contact.,0.87,message_0238;message_0381
-msg_095,notify,personal,Direct personal message from contact.,0.87,message_0087;message_0183
-msg_074,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0389;message_0204
-msg_073,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0087;message_0184
-msg_054,digest,personal,Standard group activity update.,0.8,message_0389;message_0163
-msg_068,digest,personal,Standard group activity update.,0.8,message_0191;message_0192
-msg_100,notify,personal,Direct personal message from contact.,0.87,message_0228;message_0362
-msg_062,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0043;message_0130
-msg_096,notify,personal,Direct personal message from contact.,0.87,none
-msg_043,mute,forward,The message matches repeated forward chains or viral spam patterns.,0.88,message_0130;message_0271
-msg_077,digest,personal,Standard group activity update.,0.8,message_0037;message_0255
-msg_081,digest,personal,Standard group activity update.,0.8,message_0217;message_0078
-msg_025,digest,business_update,Verified business notification update.,0.86,message_0239;message_0004
-msg_084,digest,business_update,Verified business notification update.,0.86,message_0391;message_0389
-msg_022,digest,personal,Standard group activity update.,0.8,message_0151;message_0152
+msg_023,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.49).,0.88,message_0243;message_0102
+msg_091,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0238;message_0381
+msg_090,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.48).,0.86,message_0339;message_0338
+msg_048,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.37).,0.86,message_0151;message_0152
+msg_040,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0136;message_0135
+msg_075,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.39).,0.86,message_0206;message_0205
+msg_005,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0065;message_0332
+msg_104,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0050;message_0383
+msg_069,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0194;message_0193
+msg_107,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.46).,0.86,message_0173;message_0213
+msg_070,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0369;message_0213
+msg_003,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0031;message_0400
+msg_099,digest,personal,BERT Context Engine: Personal 1-on-1 message.,0.85,message_0227;message_0249
+msg_008,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.17).,0.86,message_0072;message_0071
+msg_092,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.51).,0.88,message_0346;message_0344
+msg_060,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.24).,0.54,message_0176;message_0284
+msg_004,digest,event,BERT Context Engine: Business notification update (similarity: 0.48).,0.86,message_0246;message_0245
+msg_030,digest,promotion,Structural co-occurrence of selling verb with price or logistics phrasing.,0.88,message_0115;message_0050
+msg_045,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.51).,0.86,message_0371;message_0230
+msg_052,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0208;message_0207
+msg_009,mute,personal,Group is muted by user preferences.,0.84,message_0074;message_0073
+msg_071,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0197;message_0198
+msg_016,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0087;message_0024
+msg_065,digest,promotion,Promotional Policy Guard: Verified business promotion routed to daily digest.,0.82,message_0261;message_0260
+msg_038,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0131;message_0132
+msg_086,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0249;message_0222
+msg_014,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0017;message_0258
+msg_094,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0356;message_0048
+msg_029,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0095;message_0332
+msg_105,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0233;message_0373
+msg_002,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0169;message_0266
+msg_010,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.21).,0.86,message_0011;message_0242
+msg_078,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0211;message_0212
+msg_013,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0081;message_0082
+msg_018,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0092;message_0026
+msg_044,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0036;message_0143
+msg_032,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0285;message_0119
+msg_106,digest,event,BERT Context Engine: Scheduled event or community notice (similarity: 0.33).,0.85,message_0234;message_0376
+msg_006,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0271;message_0029
+msg_109,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.40).,0.86,message_0151;message_0152
+msg_108,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0094;message_0093
+msg_019,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0275;message_0277
+msg_088,digest,personal,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0115;message_0050
+msg_056,notify,personal,Direct mention targeting user overrides muted group preferences.,0.9,message_0226;message_0077
+msg_027,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0272;message_0033
+msg_050,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0279;message_0278
+msg_083,digest,personal,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0219
+msg_063,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0254;message_0255
+msg_033,digest,greeting,BERT Context Engine: Courtesy greeting or wish (similarity: 0.44).,0.82,message_0409;message_0121
+msg_061,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0193;message_0194
+msg_020,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0095;message_0390
+msg_017,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.48).,0.88,message_0090;message_0089
+msg_058,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0078;message_0172
+msg_026,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0032;message_0107
+msg_047,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.40).,0.7,message_0150;message_0152
+msg_046,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0148;message_0147
+msg_042,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.45).,0.75,message_0140;message_0057
+msg_079,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0369;message_0173
+msg_098,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.28).,0.58,message_0226;message_0054
+msg_037,digest,greeting,BERT Context Engine: Courtesy greeting or wish (similarity: 0.17).,0.82,message_0130;message_0269
+msg_007,digest,event,BERT Context Engine: Scheduled event or community notice (similarity: 0.53).,0.85,message_0275;message_0070
+msg_085,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0173;message_0221
+msg_001,notify,urgent,Verified Group Admin time-bound relative deadline announcement.,0.94,message_0057;message_0240
+msg_021,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0130;message_0190
+msg_028,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0034;message_0112
+msg_012,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0194;message_0247
+msg_064,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0087;message_0183
+msg_103,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0065;message_0332
+msg_031,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0249;message_0055
+msg_057,notify,urgent,Direct user mention co-occurring with critical work escalation pattern.,0.92,message_0169;message_0031
+msg_087,digest,personal,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0391;message_0389
+msg_067,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.42).,0.88,message_0068;message_0030
+msg_039,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.40).,0.86,message_0255;message_0364
+msg_082,digest,personal,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0218;message_0397
+msg_066,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0402;message_0052
+msg_049,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0291;message_0154
+msg_015,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0173;message_0213
+msg_051,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0402;message_0052
+msg_097,digest,personal,BERT Context Engine: Personal 1-on-1 message.,0.85,message_0054;message_0167
+msg_089,digest,event,BERT Context Engine: Scheduled event or community notice (similarity: 0.29).,0.85,message_0299;message_0396
+msg_053,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0411;message_0253
+msg_059,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.40).,0.88,message_0173;message_0053
+msg_024,mute,promotion,Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.,0.85,message_0402;message_0052
+msg_072,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0213;message_0085
+msg_036,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0283;message_0127
+msg_076,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0208;message_0207
+msg_055,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0166;message_0165
+msg_102,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.32).,0.62,message_0371;message_0230
+msg_080,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.31).,0.61,message_0130;message_0190
+msg_093,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0348;message_0349
+msg_034,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0077;message_0078
+msg_035,digest,business_update,BERT Context Engine: Business notification update (similarity: 0.29).,0.86,message_0281;message_0125
+msg_101,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.29).,0.59,message_0370;message_0229
+msg_041,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0077;message_0171
+msg_011,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0077;message_0171
+msg_110,mute,scam,"Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",0.98,message_0238;message_0381
+msg_095,notify,personal,BERT Context Engine: Personal 1-on-1 message.,0.85,message_0087;message_0183
+msg_074,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0389;message_0204
+msg_073,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0087;message_0184
+msg_054,digest,payment,BERT Context Engine: Financial transaction notice (similarity: 0.44).,0.88,message_0389;message_0163
+msg_068,digest,personal,BERT Context Engine: Standard group message.,0.8,message_0191;message_0192
+msg_100,notify,urgent,BERT Context Engine: Urgent event detected (similarity: 0.43).,0.73,message_0228;message_0362
+msg_062,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0043;message_0130
+msg_096,digest,personal,BERT Context Engine: Personal 1-on-1 message.,0.85,none
+msg_043,mute,forward,Security Policy Guard: Viral forward chain pattern detected.,0.88,message_0130;message_0271
+msg_077,digest,event,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0037;message_0255
+msg_081,digest,personal,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0217;message_0078
+msg_025,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0239;message_0004
+msg_084,digest,business_update,Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.,0.62,message_0391;message_0389
+msg_022,digest,business_update,Status-progression update downgraded to digest due to recent duplicate notification refire.,0.8,message_0151;message_0152

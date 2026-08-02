@@ -1,0 +1,193 @@
+{
+  "__quota_stats__": {
+    "date": "2026-08-02",
+    "calls": 23
+  },
+  "3978d568c9e8f0d36db289356f31effe": {
+    "extracted_text": "Image attachment img_008.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "4c40103b565bfebd0f4e747361837191": {
+    "extracted_text": "Image attachment img_012.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "d76ab1ce3f390cb1a94306c2518f2509": {
+    "extracted_text": "Image attachment img_010.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "4fd0447d75e65032edbbafd0d58e0128": {
+    "transcription": "Voice note audio (37.1s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 37.1,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "28f4de0824d587e93a069d242a2cc1d0": {
+    "transcription": "Voice note audio (129.2s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 129.2,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "10da43fae7ea3dfa943201e4a55fa5f9": {
+    "extracted_text": "Image attachment img_003.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "ae8d080055b2e8caf3386c70cd284a04": {
+    "transcription": "Voice note audio (159.0s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 159.0,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "670d66c80b723f21637e1d92ea4d028d": {
+    "transcription": "Voice note audio (120.4s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 120.4,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "2f657522ecd05cdedae30bf14506e1eb": {
+    "extracted_text": "Image attachment img_002.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "4300e99acf308f7b986895ed1c7b4f40": {
+    "extracted_text": "Image attachment img_004.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "7ebe2f9d584c38cb6e96a1c65b44acbf": {
+    "transcription": "Voice note audio (166.4s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 166.4,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "f9654705352ead5db5adc5b9fd8efde4": {
+    "transcription": "Voice note audio (173.4s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 173.4,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "cdfe3531425b27026cb48cabc3ad354c": {
+    "extracted_text": "Image attachment img_007.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "2a3a74747686b190f7a905fa613f7c46": {
+    "extracted_text": "Image attachment img_024.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "964510e447097254c861e5cb66296919": {
+    "extracted_text": "Image attachment img_025.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "1d89fcf8e57c4c5df3f2c7fee2d4b5eb": {
+    "extracted_text": "Image attachment img_023.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "6e474b1ea65e28d062e32987884bb580": {
+    "extracted_text": "Image attachment img_011.jpg",
+    "detected_intent": "unknown",
+    "is_scam_suspect": false,
+    "has_urgent_signals": false,
+    "vlm_used": false,
+    "fallback_used": true
+  },
+  "e016f9ad94ed74522f0a598751995249": {
+    "transcription": "Voice note audio (36.6s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 36.6,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "c288fb451bff0614732f13e6c44b3232": {
+    "transcription": "Voice note audio (68.4s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 68.4,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "c7f55bccea7e588df4640d028992ee6b": {
+    "transcription": "Voice note audio (23.2s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 23.2,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "6fb44afe2f29d0b6dbb3e6422ee24eaa": {
+    "transcription": "Voice note audio (21.8s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 21.8,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  },
+  "b92bd79f328d2d41f991f0b7a6ee5caf": {
+    "transcription": "Voice note audio (47.6s)",
+    "detected_intent": "personal",
+    "has_urgent_signals": false,
+    "duration_sec": 47.6,
+    "stt_used": false,
+    "model_used": "metadata_fallback",
+    "fallback_used": true
+  }
+}

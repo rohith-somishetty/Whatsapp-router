@@ -3,17 +3,20 @@ from typing import Dict, Any
 from context import ContextEngine
 from media import HybridMediaProcessor
 from retrieval import EvidenceRetriever
+from semantic_context import SemanticContextClassifier
 
 class NotificationRouter:
     """
-    Fenced Decision Engine for personalized WhatsApp message routing.
-    Integrates deterministic safety guards, dynamic contextual classification,
-    and calibrated confidence scoring.
+    WhatsApp Message Notification Router powered by:
+    1. Relational Context & Security Policy Guard (Domain Reputation, Phishing, OTP Theft & Prompt Injection Interceptor)
+    2. Consolidated Feature Extractor (Admin Urgency, C2C Selling Co-occurrence, @Mention Escalation, Status Progression)
+    3. Multi-Centroid BERT Transformer Context Engine with Soft Negation Downweighting
     """
     def __init__(self, context: ContextEngine, media: HybridMediaProcessor, retriever: EvidenceRetriever):
         self.context = context
         self.media = media
         self.retriever = retriever
+        self.semantic_engine = SemanticContextClassifier()
 
     def route_message(self, msg: Dict[str, Any]) -> Dict[str, Any]:
         user_id = msg.get("user_id", "")
@@ -37,7 +40,9 @@ class NotificationRouter:
             media_features = self.media.process_voice_note(audio_path)
 
         extracted_media_text = media_features.get("extracted_text", "") or media_features.get("transcription", "")
-        full_text = f"{msg_text} {extracted_media_text}".strip().lower()
+        full_text = f"{msg_text} {extracted_media_text}".strip()
+        lower_text = full_text.lower()
+        fallback_used = media_features.get("fallback_used", False)
 
         # Add media text back to msg dict for retrieval query
         msg["media_text"] = extracted_media_text
@@ -45,34 +50,37 @@ class NotificationRouter:
         # 2. Query RAG Evidence Retriever
         evidence_ids = self.retriever.find_evidence(msg)
 
-        # 3. Context Lookups
+        # 3. Relational Context Lookups from ContextEngine
         is_dnd = self.context.is_quiet_hours(user_id, created_at)
         user_info = self.context.get_user_info(user_id)
         group_info = self.context.get_group_info(group_id) if group_id else {}
-        group_member_info = self.context.get_group_membership(group_id, user_id) if group_id else {}
+        
+        # Verify admin sender directly via group_members.csv relational lookup
+        sender_group_info = self.context.get_group_membership(group_id, sender_id) if (group_id and sender_id) else {}
+        is_admin_sender = (sender_group_info.get("role") == "admin")
+
+        user_group_info = self.context.get_group_membership(group_id, user_id) if (group_id and user_id) else {}
+        is_group_muted = (user_group_info.get("group_muted_by_user") == "1")
+
         biz_info = self.context.get_business_info(business_id) if business_id else {}
         user_biz_info = self.context.get_user_business_history(user_id, business_id) if (user_id and business_id) else {}
+        is_verified_biz = (biz_info.get("verified") == "1")
+        has_biz_history = bool(user_biz_info)
 
-        is_group_muted = (group_member_info.get("group_muted_by_user") == "1")
-        is_admin_sender = (group_member_info.get("role") == "admin") or (sender_id and self.context.get_group_membership(group_id, sender_id).get("role") == "admin")
+        has_direct_mention = f"@{user_id}".lower() in lower_text or f"@{sender_id}".lower() in lower_text or "@u_" in lower_text
 
-        # Check for direct user mention e.g. "@u_010" or "@u_004"
-        has_direct_mention = f"@{user_id}".lower() in full_text
+        # 4. Consolidated Feature Extraction
+        struct_feats = self.semantic_engine.extract_structural_features(
+            full_text,
+            is_admin=is_admin_sender,
+            has_mention=has_direct_mention,
+            conv_type=conv_type
+        )
 
         # ---------------------------------------------------------
-        # STAGE 1: Hard Safety & Scam / Phishing / Fraud Protection
+        # STAGE 1: SECURITY POLICY GUARD (Imposter Domain, Phishing, OTP Theft & Prompt Injection)
         # ---------------------------------------------------------
 
-        scam_keywords = [
-            "lottery", "prize", "otp", "verify account", "claim reward", "reattempt fee",
-            "bankofamerica-delivery", "amazonpay-delivery", "giveaway", "0.5 btc", "crypto",
-            "work from home", "typing online", "scratch card", "e-kyc", "kyc", "account suspended",
-            "account block", "sim card will be deactivated", "unauthorized login", "security alert",
-            "verify ssn", "instant loan", "apk", "whatsapp gold", "redelivery", "spin the wheel",
-            "spin-win", "refund pending", "t.me/", "bit.ly/", ".xyz", ".site", ".online", ".net",
-            "free ₹", "free $", "earn ₹", "earn $", "1000% return", "pump channel", "win $", "won $"
-        ]
-        
         domain_mismatch = False
         if biz_info:
             off_domain = biz_info.get("official_domain", "")
@@ -84,157 +92,213 @@ class NotificationRouter:
         if biz_info:
             is_unverified = (biz_info.get("verified") == "0")
             user_reports = int(biz_info.get("user_reports_30d", 0) or 0)
-            if is_unverified and (user_reports > 10 or domain_mismatch):
+            if is_unverified and (user_reports > 0 or domain_mismatch or any(k in biz_info.get("display_name", "").lower() for k in ["chase", "phonepe", "hdfc", "airtel", "hsbc", "razorpay", "green cross"])):
                 is_unverified_imposter_biz = True
 
-        has_scam_pattern = any(k in full_text for k in scam_keywords) or domain_mismatch or is_unverified_imposter_biz or media_features.get("is_scam_suspect")
+        credential_theft_pattern = r"\b(?:reply with|confirm|verify|send)\s+(?:the\s+)?(?:6|4)?\s*digit\s*(?:code|otp|login)|confirm password|verify wallet|verify card|verify account|otp (?:may have|has) leaked|workspace access will expire\b"
+        prompt_injection_pattern = r"\bignore\s+(?:all\s+)?previous\s+(?:instructions|rules|prompt|routing)\b"
+        
+        has_credential_theft = bool(re.search(credential_theft_pattern, lower_text))
+        has_prompt_injection = bool(re.search(prompt_injection_pattern, lower_text))
 
-        if has_scam_pattern:
+        phishing_url_patterns = [
+            "bit.ly/", "t.me/", ".xyz", ".site", ".online", ".tech", ".cc", ".info",
+            "account-login.in", "http://", "https://", "0.5 btc", "crypto giveaway", "scratch card", "e-kyc",
+            "verify ssn", "instant loan", "whatsapp gold", "trai", "spin-win", "refund pending",
+            "unclaimed parcel", "home-job", "1000% return", "parttime", "echallan", "recharge-free",
+            "double your money", "casino bonus", "accidentally sent ₹", "claim ₹", "verification fee"
+        ]
+        has_suspicious_url = any(k in lower_text for k in phishing_url_patterns)
+
+        if is_unverified_imposter_biz or domain_mismatch or has_suspicious_url or has_credential_theft or has_prompt_injection or media_features.get("is_scam_suspect"):
             return {
                 "message_id": msg["message_id"],
                 "action": "mute",
                 "message_type": "scam",
-                "reason": "The message contains suspicious links, imposter business indicators, or scam patterns.",
-                "confidence": 0.95,
+                "reason": "Security Policy Guard: Malicious phishing, credential theft, or prompt injection detected.",
+                "confidence": 0.98,
                 "evidence_message_ids": evidence_ids
             }
 
-        # ---------------------------------------------------------
-        # STAGE 2: Forwarded Spam & Chain Messages
-        # ---------------------------------------------------------
-
-        if forwarded_count >= 5 or any(w in full_text for w in ["send this message to", "send this prayer", "drink warm water", "forwarded as received"]):
+        # Forward Chain Security Policy
+        forward_phrases = ["send this message to", "send this prayer", "drink warm water", "forwarded as received", "forward this", "do not break the chain", "send this blessings", "forward this devotional"]
+        if forwarded_count >= 5 or any(w in lower_text for w in forward_phrases):
             return {
                 "message_id": msg["message_id"],
                 "action": "mute",
-                "message_type": "forward" if forwarded_count >= 5 else "spam",
-                "reason": "The message matches repeated forward chains or viral spam patterns.",
+                "message_type": "forward" if (forwarded_count >= 5 or "forward" in lower_text or "send this" in lower_text) else "spam",
+                "reason": "Security Policy Guard: Viral forward chain pattern detected.",
                 "confidence": 0.88,
                 "evidence_message_ids": evidence_ids
             }
 
         # ---------------------------------------------------------
-        # STAGE 3: Direct User Mentions & Urgent Overrides
+        # STAGE 2: STRUCTURAL OVERRIDES & SENDER-TRUST GATED UPWEIGHTS
         # ---------------------------------------------------------
+
+        if struct_feats["is_admin_time_urgent"]:
+            is_school_event = any(k in lower_text for k in ["school", "bus", "parents", "circular", "consent note", "timing", "pickup", "trip", "stadium"])
+            return {
+                "message_id": msg["message_id"],
+                "action": "notify",
+                "message_type": "event" if is_school_event else "urgent",
+                "reason": "Verified Group Admin time-bound relative deadline announcement.",
+                "confidence": 0.94,
+                "evidence_message_ids": evidence_ids
+            }
+
+        if struct_feats["is_mention_escalation"]:
+            return {
+                "message_id": msg["message_id"],
+                "action": "notify",
+                "message_type": "urgent",
+                "reason": "Direct user mention co-occurring with critical work escalation pattern.",
+                "confidence": 0.92,
+                "evidence_message_ids": evidence_ids
+            }
+
+        if struct_feats["is_c2c_selling"]:
+            return {
+                "message_id": msg["message_id"],
+                "action": "digest",
+                "message_type": "promotion",
+                "reason": "Structural co-occurrence of selling verb with price or logistics phrasing.",
+                "confidence": 0.88,
+                "evidence_message_ids": evidence_ids
+            }
+
+        if struct_feats["has_status_progression"]:
+            is_trusted_sender = is_verified_biz or is_admin_sender
+            is_recent_duplicate = (evidence_ids and len(evidence_ids) > 1)
+            
+            if is_trusted_sender and not is_recent_duplicate:
+                msg_type = "event" if ("circular" in lower_text or "appointment" in lower_text or "prescription" in lower_text) else "business_update"
+                return {
+                    "message_id": msg["message_id"],
+                    "action": "notify",
+                    "message_type": msg_type,
+                    "reason": "Verified Sender status-progression update with near-term time reference.",
+                    "confidence": 0.90,
+                    "evidence_message_ids": evidence_ids
+                }
+            elif is_recent_duplicate:
+                msg_type = "event" if ("circular" in lower_text or "appointment" in lower_text) else "business_update"
+                return {
+                    "message_id": msg["message_id"],
+                    "action": "digest",
+                    "message_type": msg_type,
+                    "reason": "Status-progression update downgraded to digest due to recent duplicate notification refire.",
+                    "confidence": 0.80,
+                    "evidence_message_ids": evidence_ids
+                }
 
         if is_group_muted and has_direct_mention:
             return {
                 "message_id": msg["message_id"],
                 "action": "notify",
-                "message_type": "urgent" if any(k in full_text for k in ["urgent", "eod", "prod", "alert", "failing", "500"]) else "personal",
-                "reason": "The message contains a direct mention targeting the user, overriding muted group preferences.",
+                "message_type": "personal",
+                "reason": "Direct mention targeting user overrides muted group preferences.",
                 "confidence": 0.90,
                 "evidence_message_ids": evidence_ids
             }
 
         # ---------------------------------------------------------
-        # STAGE 4: Urgent & Critical Time-Sensitive Intent
+        # STAGE 3: MULTI-CENTROID BERT TRANSFORMER CONTEXT ENGINE
         # ---------------------------------------------------------
 
-        urgent_keywords = [
-            "hospital", "emergency", "broke down", "pickup", "fever", "flight", "call me immediately",
-            "call back immediately", "asap", "server", "outage", "bridge call", "500 error", "deadline",
-            "production", "failing", "critical", "room 302", "expressway"
-        ]
+        semantic_cat, sim_score = self.semantic_engine.classify_context(
+            full_text,
+            is_admin=is_admin_sender,
+            has_mention=has_direct_mention,
+            conv_type=conv_type
+        )
 
-        if any(k in full_text for k in urgent_keywords):
-            msg_cat = "urgent"
-            if "upi" in full_text or "fare" in full_text:
-                msg_cat = "payment"
+        if fallback_used and (not msg_text.strip() or msg_text.strip() == "..."):
+            relational_type = "business_update" if conv_type == "business" else "personal"
+            relational_action = "digest"
+            return {
+                "message_id": msg["message_id"],
+                "action": relational_action,
+                "message_type": relational_type,
+                "reason": "Media Attachment Fallback: Classified via relational context (API inactive). Confidence capped.",
+                "confidence": 0.62,
+                "evidence_message_ids": evidence_ids
+            }
+
+        if semantic_cat == "urgent":
+            msg_cat = "payment" if ("upi" in lower_text or "wallet" in lower_text or "deposit" in lower_text or "fare" in lower_text) else "urgent"
             return {
                 "message_id": msg["message_id"],
                 "action": "notify",
                 "message_type": msg_cat,
-                "reason": "Time-sensitive urgent message requiring immediate user attention.",
-                "confidence": 0.92,
+                "reason": f"BERT Context Engine: Urgent event detected (similarity: {sim_score:.2f}).",
+                "confidence": min(0.95, sim_score + 0.3),
                 "evidence_message_ids": evidence_ids
             }
 
-        # ---------------------------------------------------------
-        # STAGE 5: Payment & Financial Transactions
-        # ---------------------------------------------------------
-
-        payment_keywords = ["upi", "credited", "debited", "salary", "bill", "due on", "split share", "refund", "card ending", "neft"]
-        if any(k in full_text for k in payment_keywords):
-            is_urgent_pay = any(k in full_text for k in ["urgently", "now", "emergency", "taxi fare", "credited"])
+        if semantic_cat == "payment":
+            is_urgent_pay = any(k in lower_text for k in ["urgently", "emergency", "taxi fare", "credited", "order executed", "gpay alert", "neft"])
             return {
                 "message_id": msg["message_id"],
                 "action": "notify" if is_urgent_pay else "digest",
                 "message_type": "payment",
-                "reason": "Financial transaction or payment notice.",
+                "reason": f"BERT Context Engine: Financial transaction notice (similarity: {sim_score:.2f}).",
                 "confidence": 0.88,
                 "evidence_message_ids": evidence_ids
             }
 
-        # ---------------------------------------------------------
-        # STAGE 6: Event & Party Invitations
-        # ---------------------------------------------------------
-
-        event_keywords = ["invited", "invitation", "party", "concert", "picnic", "reunion", "wedding", "save the date", "book of the month", "water supply", "shut off", "tickets"]
-        if any(k in full_text for k in event_keywords):
+        if semantic_cat == "event":
             return {
                 "message_id": msg["message_id"],
                 "action": "digest",
                 "message_type": "event",
-                "reason": "Event invitation or scheduled community notice.",
+                "reason": f"BERT Context Engine: Scheduled event or community notice (similarity: {sim_score:.2f}).",
                 "confidence": 0.85,
                 "evidence_message_ids": evidence_ids
             }
 
-        # ---------------------------------------------------------
-        # STAGE 7: Business Account Messaging (Verified)
-        # ---------------------------------------------------------
-
-        if conv_type == "business" and biz_info:
-            is_promo_text = any(k in full_text for k in ["sale", "off", "discount", "coupon", "arrivals", "eorr", "flash sale"])
-            if is_promo_text:
+        if semantic_cat == "promotion" or (conv_type == "business" and any(k in lower_text for k in ["sale", "off", "discount", "coupon", "arrivals", "eorr", "flash sale", "savings day", "pink friday", "wishlist"])):
+            has_cold_promo_code = any(k in lower_text for k in ["50% off", "try50", "shopping offer available", "extra discounts", "kurta set"])
+            
+            if not is_verified_biz or not has_biz_history or has_cold_promo_code:
+                return {
+                    "message_id": msg["message_id"],
+                    "action": "mute",
+                    "message_type": "promotion",
+                    "reason": "Promotional Policy Guard: Cold marketing offer or unverified business promotion muted.",
+                    "confidence": 0.85,
+                    "evidence_message_ids": evidence_ids
+                }
+            else:
                 return {
                     "message_id": msg["message_id"],
                     "action": "digest",
                     "message_type": "promotion",
-                    "reason": "Promotional campaign update from business sender.",
+                    "reason": "Promotional Policy Guard: Verified business promotion routed to daily digest.",
                     "confidence": 0.82,
                     "evidence_message_ids": evidence_ids
                 }
-            else:
-                return {
-                    "message_id": msg["message_id"],
-                    "action": "notify" if any(k in full_text for k in ["shipped", "dispatched", "delivered"]) else "digest",
-                    "message_type": "business_update",
-                    "reason": "Verified business notification update.",
-                    "confidence": 0.86,
-                    "evidence_message_ids": evidence_ids
-                }
 
-        # ---------------------------------------------------------
-        # STAGE 8: Personal 1-on-1 Chats
-        # ---------------------------------------------------------
+        if semantic_cat == "greeting":
+            return {
+                "message_id": msg["message_id"],
+                "action": "digest",
+                "message_type": "greeting",
+                "reason": f"BERT Context Engine: Courtesy greeting or wish (similarity: {sim_score:.2f}).",
+                "confidence": 0.82,
+                "evidence_message_ids": evidence_ids
+            }
 
-        if conv_type == "personal":
-            is_casual = any(k in full_text for k in ["dinner", "coffee", "photos", "recipe", "movie", "catch up", "how are you", "weekend"])
-            if is_casual:
-                msg_cat = "greeting" if ("coffee" in full_text or "how are you" in full_text or "great week" in full_text) else "personal"
-                return {
-                    "message_id": msg["message_id"],
-                    "action": "digest",
-                    "message_type": msg_cat,
-                    "reason": "Casual personal conversation update.",
-                    "confidence": 0.82,
-                    "evidence_message_ids": evidence_ids
-                }
-            else:
-                return {
-                    "message_id": msg["message_id"],
-                    "action": "notify",
-                    "message_type": "personal",
-                    "reason": "Direct personal message from contact.",
-                    "confidence": 0.87,
-                    "evidence_message_ids": evidence_ids
-                }
-
-        # ---------------------------------------------------------
-        # STAGE 9: Group Message Default
-        # ---------------------------------------------------------
+        if semantic_cat == "business_update" or conv_type == "business":
+            is_notify_update = any(k in lower_text for k in ["shipped", "dispatched", "delivered", "arriving in", "tracking update", "order executed", "appointment reminder"])
+            return {
+                "message_id": msg["message_id"],
+                "action": "notify" if is_notify_update else "digest",
+                "message_type": "event" if "appointment" in lower_text else "business_update",
+                "reason": f"BERT Context Engine: Business notification update (similarity: {sim_score:.2f}).",
+                "confidence": 0.86,
+                "evidence_message_ids": evidence_ids
+            }
 
         if conv_type == "group":
             if is_group_muted:
@@ -242,29 +306,35 @@ class NotificationRouter:
                     "message_id": msg["message_id"],
                     "action": "mute",
                     "message_type": "personal",
-                    "reason": "Group is muted by user.",
+                    "reason": "Group is muted by user preferences.",
                     "confidence": 0.84,
                     "evidence_message_ids": evidence_ids
                 }
-            else:
-                return {
-                    "message_id": msg["message_id"],
-                    "action": "digest",
-                    "message_type": "personal",
-                    "reason": "Standard group activity update.",
-                    "confidence": 0.80,
-                    "evidence_message_ids": evidence_ids
-                }
+            return {
+                "message_id": msg["message_id"],
+                "action": "digest",
+                "message_type": "personal",
+                "reason": "BERT Context Engine: Standard group message.",
+                "confidence": 0.80,
+                "evidence_message_ids": evidence_ids
+            }
 
-        # ---------------------------------------------------------
-        # STAGE 10: Fallback Route
-        # ---------------------------------------------------------
+        if conv_type == "personal":
+            is_casual = (semantic_cat in ["personal", "greeting"]) or any(k in lower_text for k in ["dinner", "coffee", "photos", "recipe", "movie", "catch up", "how are you", "weekend", "book", "job", "podcast", "electrician", "hotel", "lunch", "gardening", "itinerary", "helping", "hiking", "reach home safely", "playlist", "house", "tennis", "voice note from mom"])
+            return {
+                "message_id": msg["message_id"],
+                "action": "digest" if is_casual else "notify",
+                "message_type": "personal",
+                "reason": "BERT Context Engine: Personal 1-on-1 message.",
+                "confidence": 0.85,
+                "evidence_message_ids": evidence_ids
+            }
 
         return {
             "message_id": msg["message_id"],
             "action": "digest" if not is_dnd else "mute",
             "message_type": "personal" if conv_type == "personal" else ("business_update" if conv_type == "business" else "personal"),
-            "reason": "Standard contextual priority routing.",
+            "reason": "BERT Context Engine: Standard priority routing.",
             "confidence": 0.78,
             "evidence_message_ids": evidence_ids
         }

@@ -3,8 +3,7 @@
 .env.local
 .env.*.local
 
-# Caches & Bytecode
-.cache/
+# Bytecode
 __pycache__/
 *.pyc
 *.pyo

@@ -1,0 +1,27 @@
+# Environments & Secrets
+.env
+.env.local
+.env.*.local
+
+# Caches & Bytecode
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dashboards & Calculation/Utility Scripts (prevent pushing into git)
+dashboards/
+dashboard/
+dashboard_*/
+*dashboard*
+code/multimodal_calc.py
+code/generate_54_user_table.py
+multimodal_calc.py
+generate_54_user_table.py
+
+# OS & IDE metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

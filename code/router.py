@@ -95,22 +95,59 @@ class NotificationRouter:
             if is_unverified and (user_reports > 0 or domain_mismatch or any(k in biz_info.get("display_name", "").lower() for k in ["chase", "phonepe", "hdfc", "airtel", "hsbc", "razorpay", "green cross"])):
                 is_unverified_imposter_biz = True
 
+        # English credential theft patterns
         credential_theft_pattern = r"\b(?:reply with|confirm|verify|send)\s+(?:the\s+)?(?:6|4)?\s*digit\s*(?:code|otp|login)|confirm password|verify wallet|verify card|verify account|otp (?:may have|has) leaked|workspace access will expire\b"
-        prompt_injection_pattern = r"\bignore\s+(?:all\s+)?previous\s+(?:instructions|rules|prompt|routing)\b"
-        
+
+        # Expanded prompt injection: router override metadata patterns
+        prompt_injection_pattern = (
+            r"\bignore\s+(?:all\s+)?previous\s+(?:instructions|rules|prompt|routing)\b"
+            r"|\b(?:routing\s+override|system\s+note\s+for\s+(?:the\s+)?(?:notification\s+)?router|internal\s+router\s+metadata|assistant\s+instruction)\b"
+            r"|\b(?:set\s+action\s*=\s*notify|action\s*=\s*notify|mark\s+(?:this\s+(?:as\s+)?)?notify|mark\s+notify|verified_business\s*=\s*true|user_priority\s*=\s*high)\b"
+        )
+
         has_credential_theft = bool(re.search(credential_theft_pattern, lower_text))
         has_prompt_injection = bool(re.search(prompt_injection_pattern, lower_text))
 
+        # Hindi OTP / account-block scam patterns
+        hindi_scam_pattern = (
+            r"\b(?:otp\s+(?:abhi|jaldi|batao|dalo|share|verify|confirm)|account\s+block\s+ho|profile\s+band\s+ho"
+            r"|link\s+open\s+karo|account\s+bachane|verify\s+(?:nahi|karein|karo)|code\s+daal\s+do"
+            r"|hold\s+pe\s+chala\s+jayega|account-help\.in|support\s+bhi\s+reopen)\b"
+        )
+        has_hindi_scam = bool(re.search(hindi_scam_pattern, lower_text))
+
+        # QR + payment pressure scam patterns
+        qr_payment_pattern = (
+            r"\b(?:scan\s+(?:the\s+)?qr\s+and\s+pay|scan\s+and\s+pay"
+            r"|pay\s+(?:the\s+)?(?:clearance|penalty|charge|amount)\s+(?:immediately|now|today|urgently|before)"
+            r"|clearance\s+amount|reactivation\s+fee|processing\s+fee\s+at\s+this\s+link"
+            r"|send\s+screenshot\s+(?:after|once)|fill\s+bank\s+details\s+on)\b"
+        )
+        has_qr_payment_scam = bool(re.search(qr_payment_pattern, lower_text))
+
+        # Account/card number sharing pressure
+        account_sharing_pattern = (
+            r"\b(?:shar(?:e|ing)\s+(?:your\s+)?(?:account\s+number|card\s+details|bank\s+details)"
+            r"|send\s+(?:your\s+)?(?:card|account|bank)\s+details"
+            r"|claim\s+(?:benefits|amount|rewards?)\s+by\s+shar"
+            r"|approval\s+window\s+closes|amount\s+will\s+be\s+released\s+today)\b"
+        )
+        has_account_sharing_scam = bool(re.search(account_sharing_pattern, lower_text))
+
         phishing_url_patterns = [
             "bit.ly/", "t.me/", ".xyz", ".site", ".online", ".tech", ".cc", ".info",
-            "account-login.in", "http://", "https://", "0.5 btc", "crypto giveaway", "scratch card", "e-kyc",
+            "account-login.in", "account-help.in", "http://", "https://", "0.5 btc",
+            "crypto giveaway", "scratch card", "e-kyc",
             "verify ssn", "instant loan", "whatsapp gold", "trai", "spin-win", "refund pending",
             "unclaimed parcel", "home-job", "1000% return", "parttime", "echallan", "recharge-free",
             "double your money", "casino bonus", "accidentally sent ₹", "claim ₹", "verification fee"
         ]
         has_suspicious_url = any(k in lower_text for k in phishing_url_patterns)
 
-        if is_unverified_imposter_biz or domain_mismatch or has_suspicious_url or has_credential_theft or has_prompt_injection or media_features.get("is_scam_suspect"):
+        if (is_unverified_imposter_biz or domain_mismatch or has_suspicious_url
+                or has_credential_theft or has_prompt_injection
+                or has_hindi_scam or has_qr_payment_scam or has_account_sharing_scam
+                or media_features.get("is_scam_suspect")):
             return {
                 "message_id": msg["message_id"],
                 "action": "mute",
@@ -121,12 +158,26 @@ class NotificationRouter:
             }
 
         # Forward Chain Security Policy
-        forward_phrases = ["send this message to", "send this prayer", "drink warm water", "forwarded as received", "forward this", "do not break the chain", "send this blessings", "forward this devotional"]
-        if forwarded_count >= 5 or any(w in lower_text for w in forward_phrases):
+        forward_phrases = ["send this message to", "send this prayer", "drink warm water", "forwarded as received", "forward this", "do not break the chain", "send this blessings", "forward this devotional", "share with everyone", "forward to all", "share in family groups", "share in all family", "share to all groups", "pls forward", "please forward"]
+        greeting_forward_keywords = ["good morning", "god bless", "stay blessed", "blessings", "positive energy", "bhagwan", "shayad", "smile today", "good day", "have a nice", "forwarding because it felt"]
+
+        # Society/admin critical notices should not be silenced even if forwarded
+        SOCIETY_URGENT_KEYWORDS = ["tanker", "motor room", "water supply", "fire alarm", "lift maintenance", "gate band", "repair truck", "gate closes", "parking", "main gate"]
+        is_legitimate_admin_forward = is_admin_sender and any(k in lower_text for k in SOCIETY_URGENT_KEYWORDS)
+
+        if not is_legitimate_admin_forward and (forwarded_count >= 5 or any(w in lower_text for w in forward_phrases)):
+            # Determine best message_type for this muted forward
+            is_greeting_fwd = any(k in lower_text for k in greeting_forward_keywords)
+            if is_greeting_fwd:
+                fwd_type = "greeting"
+            elif forwarded_count >= 5 or "forward" in lower_text or "send this" in lower_text:
+                fwd_type = "forward"
+            else:
+                fwd_type = "spam"
             return {
                 "message_id": msg["message_id"],
                 "action": "mute",
-                "message_type": "forward" if (forwarded_count >= 5 or "forward" in lower_text or "send this" in lower_text) else "spam",
+                "message_type": fwd_type,
                 "reason": "Security Policy Guard: Viral forward chain pattern detected.",
                 "confidence": 0.88,
                 "evidence_message_ids": evidence_ids
@@ -290,11 +341,26 @@ class NotificationRouter:
             }
 
         if semantic_cat == "business_update" or conv_type == "business":
-            is_notify_update = any(k in lower_text for k in ["shipped", "dispatched", "delivered", "arriving in", "tracking update", "order executed", "appointment reminder"])
+            # Expanded notify triggers: include present-tense delivery/status language
+            NOTIFY_BIZ_TRIGGERS = [
+                "shipped", "dispatched", "delivered", "arriving in", "tracking update",
+                "order executed", "appointment reminder", "packed", "expected to reach",
+                "pickup or route", "route status has changed", "status has changed",
+                "order is ready", "delivery today", "at your gate", "outside your",
+                "please pick up", "collect by", "confirm in the next", "collect it from gate",
+                "your ride", "driver", "return pickup today", "shopee return"
+            ]
+            # For verified business with user history, notify on delivery/appointment signals
+            is_notify_update = any(k in lower_text for k in NOTIFY_BIZ_TRIGGERS)
+            # Healthcare + verified = notify (matches sample_005 pattern)
+            # Only trigger on genuine healthcare terms, not logistics "pickup"
+            is_healthcare_event = ("appointment" in lower_text or "prescription" in lower_text) and is_verified_biz
+            should_notify = is_notify_update and (is_verified_biz or is_admin_sender)
+            msg_type_biz = "event" if ("appointment" in lower_text or is_healthcare_event) else "business_update"
             return {
                 "message_id": msg["message_id"],
-                "action": "notify" if is_notify_update else "digest",
-                "message_type": "event" if "appointment" in lower_text else "business_update",
+                "action": "notify" if (should_notify or is_healthcare_event) else "digest",
+                "message_type": msg_type_biz,
                 "reason": f"BERT Context Engine: Business notification update (similarity: {sim_score:.2f}).",
                 "confidence": 0.86,
                 "evidence_message_ids": evidence_ids
